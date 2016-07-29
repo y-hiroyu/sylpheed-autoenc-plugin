@@ -1,0 +1,30 @@
+Automatic Attachment Encryption Plug-in for Sylpheed
+====================================================
+
+This is a plug-in to encrypt attached files automatically when sending mails.
+
+Requirement
+-----------
+
+This plug-in requires Sylpheed 3.5.1 or later.
+It also requires 7-Zip.
+
+Install
+-------
+
+    ./configure
+    make
+    make install
+
+
+(MinGW)
+
+    ./makewin32.sh
+
+Usage
+-----
+
+1. Compose new message.
+2. Attach any files.
+3. Push "Send with encryption" button.
+4. A password notify mail is newly created. Send it if it's okay.
