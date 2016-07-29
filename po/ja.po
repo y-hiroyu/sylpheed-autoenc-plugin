@@ -1,0 +1,126 @@
+# Japanese translation of Automatic Encryption plug-in
+# Copyright (C) 2016 Hiroyuki Yamamoto
+# This file is distributed under the same license as the autoenc package.
+# Hiroyuki Yamamoto <hiro-y@kcn.ne.jp>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: autoenc 0.1.0\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=glib&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2016-07-13 17:13+0900\n"
+"PO-Revision-Date: 2016-06-09 16:35+0900\n"
+"Last-Translator: Hiroyuki Yamamoto <hiro-y@kcn.ne.jp>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../autoenc.c:104
+msgid "Configure automatic attachment encryption"
+msgstr "自動添付暗号化の設定"
+
+#: ../autoenc.c:269
+msgid "Password of encrypted file"
+msgstr "暗号化ファイルのパスワード"
+
+#: ../autoenc.c:273
+msgid ""
+"Subject: %s\\nDate: %d\\nThe password of the encrypted file attached in the "
+"above mail is as follows:\\n\\nFile name: %z\\nPassword: %p"
+msgstr ""
+"件名: %s\\n日付: %d\\nのメールで添付した暗号化ファイルのパスワードは以下にな"
+"ります。\\n\\nファイル名: %z\\nパスワード: %p"
+
+#: ../autoenc.c:378
+msgid "Send with encryption"
+msgstr "暗号化して送信"
+
+#: ../autoenc.c:414
+msgid "No attachment"
+msgstr "添付ファイルがありません"
+
+#: ../autoenc.c:414
+msgid "There is no attachment. Please attach files before sending."
+msgstr "添付ファイルがありません。送信前にファイルを添付してください。"
+
+#: ../autoenc.c:432
+msgid "Duplicate filename"
+msgstr "ファイル名が重複しています"
+
+#: ../autoenc.c:432
+msgid ""
+"There are duplicate filenames. Multiple files with same name cannot be "
+"attached."
+msgstr ""
+"ファイル名が重複しています。複数の同名のファイルを添付することはできません。"
+
+#: ../autoenc.c:449
+msgid "No recipients"
+msgstr "宛先がありません"
+
+#: ../autoenc.c:449
+msgid "Recipient is not specified."
+msgstr "宛先が指定されていません。"
+
+#: ../autoenc.c:499
+#, c-format
+msgid ""
+"Error occurred while creating encrypted zip file.\n"
+"\n"
+"7z command could not be executed. Please check if 7-Zip is correctly "
+"installed."
+msgstr ""
+"暗号化zipファイルの作成中にエラーが発生しました。\n"
+"\n"
+"7zコマンドを実行できませんでした。7-Zipが正しくインストールされているかを確認"
+"してください。"
+
+#: ../autoenc.c:501
+#, c-format
+msgid ""
+"Error occurred while creating encrypted zip file.\n"
+"\n"
+"7z command returned error (%d)"
+msgstr ""
+"暗号化zipファイルの作成中にエラーが発生しました。\n"
+"\n"
+"7zコマンドがエラーを返しました (%d)"
+
+#: ../autoenc.c:503
+#, c-format
+msgid "Encrypted zip file could not be created."
+msgstr "暗号化zipファイルを作成できませんでした。"
+
+#: ../autoenc.c:505
+msgid "Encrypted zip file creation error"
+msgstr "暗号化zipファイル作成エラー"
+
+#: ../autoenc.c:578
+msgid "Encrypting attachments"
+msgstr "添付ファイルの暗号化"
+
+#: ../autoenc.c:593
+msgid "Encrypting attachments..."
+msgstr "添付ファイルを暗号化しています..."
+
+#: ../autoenc.c:757
+msgid "Automatic Encryption Settings"
+msgstr "自動暗号化の設定"
+
+#: ../autoenc.c:772
+msgid "Enable automatic attachment encryption"
+msgstr "自動添付暗号化を有効にする"
+
+#: ../autoenc.c:775
+msgid "Password Mail Template"
+msgstr "パスワードメールテンプレート"
+
+#: ../autoenc.c:785
+msgid "Subject:"
+msgstr "件名:"
+
+#: ../autoenc.c:791
+msgid "Body:"
+msgstr "本文:"

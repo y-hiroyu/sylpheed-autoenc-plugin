@@ -1,0 +1,117 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=glib&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2016-07-22 11:09+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../autoenc.c:106
+msgid "Configure automatic attachment encryption"
+msgstr ""
+
+#: ../autoenc.c:273
+msgid "Password of encrypted file"
+msgstr ""
+
+#: ../autoenc.c:277
+msgid ""
+"Subject: %s\\nDate: %d\\nThe password of the encrypted file attached in the "
+"above mail is as follows:\\n\\nFile name: %z\\nPassword: %p"
+msgstr ""
+
+#: ../autoenc.c:403
+msgid "Send with encryption"
+msgstr ""
+
+#: ../autoenc.c:443
+msgid "No attachment"
+msgstr ""
+
+#: ../autoenc.c:443
+msgid "There is no attachment. Please attach files before sending."
+msgstr ""
+
+#: ../autoenc.c:461
+msgid "Duplicate filename"
+msgstr ""
+
+#: ../autoenc.c:461
+msgid ""
+"There are duplicate filenames. Multiple files with same name cannot be "
+"attached."
+msgstr ""
+
+#: ../autoenc.c:478
+msgid "No recipients"
+msgstr ""
+
+#: ../autoenc.c:478
+msgid "Recipient is not specified."
+msgstr ""
+
+#: ../autoenc.c:528
+#, c-format
+msgid ""
+"Error occurred while creating encrypted zip file.\n"
+"\n"
+"7z command could not be executed. Please check if 7-Zip is correctly "
+"installed."
+msgstr ""
+
+#: ../autoenc.c:530
+#, c-format
+msgid ""
+"Error occurred while creating encrypted zip file.\n"
+"\n"
+"7z command returned error (%d)"
+msgstr ""
+
+#: ../autoenc.c:532
+#, c-format
+msgid "Encrypted zip file could not be created."
+msgstr ""
+
+#: ../autoenc.c:534
+msgid "Encrypted zip file creation error"
+msgstr ""
+
+#: ../autoenc.c:607
+msgid "Encrypting attachments"
+msgstr ""
+
+#: ../autoenc.c:622
+msgid "Encrypting attachments..."
+msgstr ""
+
+#: ../autoenc.c:786
+msgid "Automatic Encryption Settings"
+msgstr ""
+
+#: ../autoenc.c:801
+msgid "Enable automatic attachment encryption"
+msgstr ""
+
+#: ../autoenc.c:804
+msgid "Password Mail Template"
+msgstr ""
+
+#: ../autoenc.c:814
+msgid "Subject:"
+msgstr ""
+
+#: ../autoenc.c:820
+msgid "Body:"
+msgstr ""
