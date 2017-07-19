@@ -28,6 +28,7 @@ struct _AppConfig
 	gboolean enable_autoenc;
 	gchar *autoenc_template_subject;
 	gchar *autoenc_template_body;
+	gboolean force_encryption;
 };
 
 #endif /* __AUTOENC_H__ */

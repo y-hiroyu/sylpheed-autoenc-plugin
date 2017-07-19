@@ -53,6 +53,7 @@ static PrefParam param[] = {
 	{"enable_autoenc", "TRUE", &config.enable_autoenc, P_BOOL},
 	{"autoenc_template_subject", NULL, &config.autoenc_template_subject, P_STRING},
 	{"autoenc_template_body", NULL, &config.autoenc_template_body, P_STRING},
+	{"force_encryption", "FALSE", &config.force_encryption, P_BOOL},
 	{NULL, NULL, NULL, P_OTHER}
 };
 
@@ -339,22 +340,45 @@ static gchar *generate_filename(void)
 	return g_strdup(filename);
 }
 
-static void change_button_sensitive(gpointer compose, GtkWidget *button)
+static void change_button_sensitive(gpointer compose, GtkWidget *toolbar)
 {
 	GSList *alist;
+	GtkWidget *send_enc_btn;
+	GtkWidget *send_btn;
+	GtkWidget *send_later_btn;
+	gboolean sensitive;
 
-	if (!button) {
+	if (!toolbar) {
 		return;
 	}
+
+	send_enc_btn = g_object_get_data(G_OBJECT(toolbar), "send-enc-button");
+	send_btn = g_object_get_data(G_OBJECT(toolbar), "se-send-button");
+	send_later_btn = g_object_get_data(G_OBJECT(toolbar), "se-send-later-button");
 
 	alist = syl_plugin_get_attach_list(compose);
 
 	if (alist) {
 		debug_print("autoenc: enable button\n");
-		gtk_widget_set_sensitive(button, TRUE);
+		sensitive = TRUE;
 	} else {
 		debug_print("autoenc: disable button\n");
-		gtk_widget_set_sensitive(button, FALSE);
+		sensitive = FALSE;
+	}
+
+	if (send_enc_btn) {
+		gtk_widget_set_sensitive(send_enc_btn, sensitive);
+	}
+	if (config.force_encryption) {
+		sensitive = !sensitive;
+	} else {
+		sensitive = TRUE;
+	}
+	if (send_btn) {
+		gtk_widget_set_sensitive(send_btn, sensitive);
+	}
+	if (send_later_btn) {
+		gtk_widget_set_sensitive(send_later_btn, sensitive);
 	}
 
 	g_slist_free(alist);
@@ -365,6 +389,7 @@ static void add_button(gpointer compose)
 	GtkWidget *toolbar;
 	PrefsCommon *prefs;
 	gint n = 0;
+	gint n_s = -1, n_sl = -1;
 	GtkToolItem *item;
 	GtkWidget *icon;
 	GdkPixbuf *pixbuf;
@@ -386,14 +411,32 @@ static void add_button(gpointer compose)
 		for (i = 0; namev[i] != NULL; i++) {
 			if (!strcmp(namev[i], "send")) {
 				debug_print("send pos: %d\n", i);
+				n_s = i;
 				n = i + 1;
-				break;
+			} else if (!strcmp(namev[i], "send-later")) {
+				debug_print("send-later pos: %d\n", i);
+				n_sl = i;
 			}
 		}
 		g_strfreev(namev);
 	} else {
 		/* send,send-later,draft,... */
+		n_s = 0;
+		n_sl = 1;
 		n = 1;
+	}
+
+	if (n_s >= 0) {
+		item = gtk_toolbar_get_nth_item(GTK_TOOLBAR(toolbar), n_s);
+		if (item) {
+			g_object_set_data(G_OBJECT(toolbar), "se-send-button", item);
+		}
+	}
+	if (n_sl >= 0) {
+		item = gtk_toolbar_get_nth_item(GTK_TOOLBAR(toolbar), n_sl);
+		if (item) {
+			g_object_set_data(G_OBJECT(toolbar), "se-send-later-button", item);
+		}
 	}
 
 	//icon = stock_pixbuf_widget_for_toolbar(STOCK_PIXMAP_MAIL_SEND);
@@ -411,7 +454,7 @@ static void add_button(gpointer compose)
 	g_signal_connect(G_OBJECT(item), "clicked",
 			 G_CALLBACK(send_encryption_clicked), compose);
 
-	change_button_sensitive(compose, GTK_WIDGET(item));
+	change_button_sensitive(compose, toolbar);
 }
 
 static void send_with_encryption(gpointer compose)
@@ -769,6 +812,7 @@ static void autoenc_settings_dialog(void)
 	GtkWidget *vbox;
 
 	GtkWidget *enable_chkbtn;
+	GtkWidget *force_chkbtn;
 	GtkWidget *frame;
 	GtkWidget *vbox2;
 	GtkWidget *hbox;
@@ -800,6 +844,10 @@ static void autoenc_settings_dialog(void)
 	enable_chkbtn = gtk_check_button_new_with_label
 		(_("Enable automatic attachment encryption"));
 	gtk_box_pack_start(GTK_BOX(vbox), enable_chkbtn, FALSE, FALSE, 0);
+
+	force_chkbtn = gtk_check_button_new_with_label
+		(_("Enforce 'Send with encryption' when there are attachments"));
+	gtk_box_pack_start(GTK_BOX(vbox), force_chkbtn, FALSE, FALSE, 0);
 
 	frame = gtk_frame_new(_("Password Mail Template"));
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
@@ -841,6 +889,8 @@ static void autoenc_settings_dialog(void)
 	/* set configuration data */
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enable_chkbtn),
 				     config.enable_autoenc);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(force_chkbtn),
+				     config.force_encryption);
 	gtk_entry_set_text(GTK_ENTRY(subject_entry), config.autoenc_template_subject);
 	body_text = unescape_newlines(config.autoenc_template_body);
 	gtk_text_buffer_set_text(text_buffer, body_text, -1);
@@ -855,6 +905,7 @@ static void autoenc_settings_dialog(void)
 		debug_print("autoenc_setting: ok clicked\n");
 
 		config.enable_autoenc = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(enable_chkbtn));
+		config.force_encryption = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(force_chkbtn));
 
 		g_free(config.autoenc_template_subject);
 		config.autoenc_template_subject = gtk_editable_get_chars(GTK_EDITABLE(subject_entry), 0, -1);
@@ -908,13 +959,11 @@ static void compose_toolbar_changed_cb(GObject *obj, gpointer compose)
 static void compose_attach_changed_cb(GObject *obj, gpointer compose)
 {
 	GtkWidget *toolbar;
-	GtkWidget *item;
 
 	debug_print("compose_attach_changed_cb\n");
 
 	toolbar = syl_plugin_compose_get_toolbar(compose);
-	item = g_object_get_data(G_OBJECT(toolbar), "send-enc-button");
-	change_button_sensitive(compose, item);
+	change_button_sensitive(compose, toolbar);
 }
 
 static void send_encryption_clicked(GtkWidget *widget, gpointer data)
