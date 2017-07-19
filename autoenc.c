@@ -1,7 +1,7 @@
 /*
  * Automatic Attachment Encryption Plug-in for Sylpheed
  * Copyright (C) 2016 Sylpheed Development Team
- * Copyright (C) 2016 Hiroyuki Yamamoto
+ * Copyright (C) 2016-2017 Hiroyuki Yamamoto
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -94,7 +94,7 @@ static void send_encryption_clicked(GtkWidget *widget, gpointer data);
 
 static void autoenc_setting(void);
 
-gulong app_exit_handler_id = 0;
+static gulong autoenc_app_exit_handler_id = 0;
 
 void plugin_load(void)
 {
@@ -106,7 +106,7 @@ void plugin_load(void)
 	syl_plugin_add_menuitem("/Configuration", _("Configure automatic attachment encryption"), autoenc_setting, NULL);
 
 	g_signal_connect_after(syl_app_get(), "init-done", G_CALLBACK(init_done_cb), NULL);
-	app_exit_handler_id =
+	autoenc_app_exit_handler_id =
 		g_signal_connect(syl_app_get(), "app-exit", G_CALLBACK(app_exit_cb), NULL);
 	syl_plugin_signal_connect("compose-created",
 				  G_CALLBACK(compose_created_cb), NULL);
@@ -132,7 +132,7 @@ void plugin_load(void)
 void plugin_unload(void)
 {
 	debug_print("autoenc plug-in unloaded!\n");
-	g_signal_handler_disconnect(syl_app_get(), app_exit_handler_id);
+	g_signal_handler_disconnect(syl_app_get(), autoenc_app_exit_handler_id);
 }
 
 SylPluginInfo *plugin_info(void)
