@@ -37,6 +37,8 @@
 #include "autoenc.h"
 #include "md5.h"
 #include "base64.h"
+#include "procmsg.h"
+#include "procheader.h"
 
 #include "send_enc.h"
 
@@ -96,6 +98,10 @@ static void send_encryption_clicked(GtkWidget *widget, gpointer data);
 static void autoenc_setting(void);
 
 static gulong autoenc_app_exit_handler_id = 0;
+
+static gpointer autoenc_compose = NULL;
+static MsgInfo *sent_msginfo = NULL;
+
 
 void plugin_load(void)
 {
@@ -479,6 +485,10 @@ static void send_with_encryption(gpointer compose)
 	gchar *subject;
 	gchar *body;
 	gchar send_date[80];
+	GtkWidget *textview;
+	GtkTextBuffer *buffer;
+	GtkTextMark *mark;
+	GtkTextIter iter;
 
 	/* Check attachments */
 	alist = syl_plugin_get_attach_list(compose);
@@ -597,8 +607,15 @@ static void send_with_encryption(gpointer compose)
 
 	/* Send */
 	get_rfc822_date(send_date, sizeof(send_date));
+	autoenc_compose = compose;
 	ret = syl_plugin_compose_send(compose, TRUE);
+	autoenc_compose = NULL;
 	if (ret != 0) {
+		if (sent_msginfo) {
+			g_unlink(sent_msginfo->file_path);
+			procmsg_msginfo_free(sent_msginfo);
+			sent_msginfo = NULL;
+		}
 		g_free(zip_path);
 		g_free(filename);
 		g_free(password);
@@ -612,10 +629,28 @@ static void send_with_encryption(gpointer compose)
 
 	/* Create password mail */
 	subject = create_password_mail_subject(orig_subject, send_date, filename, password);
-	body = create_password_mail_body(orig_subject, send_date, filename, password);
+
+	/* sent_msginfo is generated in compose_send_cb() callback */
+	if (sent_msginfo) {
+		body = replace_template_string(config.autoenc_template_body,
+					       orig_subject, send_date, filename, password);
+		compose = syl_plugin_compose_reply(sent_msginfo, NULL, 1, body);
+		g_unlink(sent_msginfo->file_path);
+		procmsg_msginfo_free(sent_msginfo);
+		sent_msginfo = NULL;
+
+		textview = syl_plugin_compose_get_textview(compose);
+		buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
+		mark = gtk_text_buffer_get_insert(buffer);
+		gtk_text_buffer_get_iter_at_mark(buffer, &iter, mark);
+		gtk_text_buffer_insert(buffer, &iter, body, -1);
+		gtk_text_buffer_insert(buffer, &iter, "\n", 1);
+	} else {
+		body = create_password_mail_body(orig_subject, send_date, filename, password);
+		compose = syl_plugin_compose_new(NULL, NULL, body, NULL);
+	}
 	debug_print("%s\n", body);
 
-	compose = syl_plugin_compose_new(NULL, NULL, body, NULL);
 	syl_plugin_compose_entry_set(compose, orig_to, 0);
 	syl_plugin_compose_entry_set(compose, orig_cc, 1);
 	if (orig_bcc && *orig_bcc != '\0')
@@ -942,9 +977,25 @@ static gboolean compose_send_cb(GObject *obj, gpointer compose,
 				gint compose_mode, gint send_mode,
 				const gchar *msg_file, GSList *to_list)
 {
+	MsgFlags flags = {0, 0};
+
 	debug_print("autoenc: %p: composed message will be sent (%p)\n", obj, compose);
 	debug_print("autoenc: compose_mode: %d, send_mode: %d, file: %s\n",
 		    compose_mode, send_mode, msg_file);
+
+	if (autoenc_compose == compose) {
+		debug_print("autoenc: this Compose object is in auto-encryption mode.\n");
+	} else {
+		return FALSE;
+	}
+
+	sent_msginfo = procheader_parse_file(msg_file, flags, FALSE);
+	if (!sent_msginfo) {
+		debug_print("autoenc: compose_send_cb: couldn't get message info of sent message\n");
+	} else {
+		sent_msginfo->file_path = get_tmp_file();
+		copy_file(msg_file, sent_msginfo->file_path, FALSE);
+	}
 
 	return FALSE; /* return TRUE to cancel sending */
 }
